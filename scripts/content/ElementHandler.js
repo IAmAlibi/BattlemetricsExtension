@@ -118,6 +118,10 @@ async function createElements() {
     createElement("dt", "Online Friends:", profileContainer);
     ONLINEFRIENDS = createElement("dd", "Loading...", profileContainer);
 
+    // Alibi Mod
+    createElement("dt", "Teammates:", profileContainer);
+    TEAM = createElement("dd", "Loading...", profileContainer);
+
     // kills, deaths, kd
     createElement("br", "", profileContainer);
     createElement("dt", "Kills:", profileContainer);
@@ -187,6 +191,9 @@ async function createElements() {
     EACBANNEDIPSINFO = createElement("div", "", collapse);
     BMBANNEDIPSINFO = createElement("div", "", collapse);
     ONLINEFRIENDSINFO = createElement("div", "", collapse);
+    // Alibi Mod
+    TEAMINFO = createElement("div", "", collapse);
+    chrome.runtime.sendMessage({ type: "GetTeamLinks", SteamID: steamID });
 
     chrome.runtime.sendMessage({ type: "GetPlayerInfo", BMID: BMID, SteamID: steamID });
     chrome.runtime.sendMessage({ type: "GetPlayerSummaries", SteamID: steamID });

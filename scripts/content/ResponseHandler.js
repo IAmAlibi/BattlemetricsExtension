@@ -11,8 +11,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         case "GetActivity":
             handleActivity(request.response);
             break;
-
+        
+        // Alibi Mod
+        case "GetTeamLinks":
+            handleTeamLinks(request.response);
+            break;
+        
         case "GetOnlineFriends":
+
             handleOnlineFriends(request.response);
             break;
 
@@ -142,6 +148,23 @@ function handleOnlineFriends(response) {
         }
     }
 }
+
+
+// Alibi Mod
+function handleTeamLinks(response) {
+    TEAM.innerHTML = response.length;
+
+    if (response.length > 0) {
+        createElement("h4", `Teammates (${response.length}):`, TEAMINFO);
+        const div = createElement("ul", "", TEAMINFO);
+        for (const teammate of response) {
+            const li = createElement("li", "", div);
+            const a = createElement("a", teammate.name, li);
+            a.href = `https://www.battlemetrics.com/rcon/players/${teammate.id}`;
+        }
+    }
+}
+
 
 function handleSteamPlaytime(response) {
     if (typeof response === "string") {

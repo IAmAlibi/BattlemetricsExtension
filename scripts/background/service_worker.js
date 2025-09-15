@@ -8,6 +8,8 @@ import { getServerPlayers } from "./battlemetrics/getServerPlayers.js";
 import { getFriendsList } from "./steam/getFriendList.js";
 import { getPlayerSummaries } from "./steam/getPlayerSummaries.js";
 import { getPlaytime } from "./steam/getPlayTime.js";
+// Alibi Mod
+import { getTeamLinks } from "./battlemetrics/getTeamLinks.js";
 
 let settings;
 async function loadSettings() {
@@ -50,7 +52,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
             const friendList = await getFriendsList(settings.SteamToken, request.SteamID);
             const players = await getServerPlayers(settings.BMToken, playerInfo.session.serverId);
-
+            
             if (friendList === undefined) {
                 chrome.tabs.sendMessage(sender.tab.id, {
                     type: "GetOnlineFriends",
@@ -122,6 +124,16 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             });
             break;
         }
+
+        // Alibi Mod
+        case "GetTeamLinks": {
+            chrome.tabs.sendMessage(sender.tab.id, {
+                type: "GetTeamLinks",
+                response: await getTeamLinks(settings.BMToken, request.SteamID, settings.Servers),
+            });
+            break;
+        }
+
         default:
             break;
     }
