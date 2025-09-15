@@ -1,0 +1,38 @@
+{
+    "name": "Advanced BM RCON 2.0",
+    "description": "Displays useful information about players on battlemetrics, making the life of admins a bit easier.",
+    "author": "Farkas",
+    "version": "2.0.0",
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "matches": ["*://www.battlemetrics.com/*", "*://battlemetrics.com/*"],
+            "js": [
+                "scripts/content/ExtensionLoader.js",
+                "scripts/content/ElementHandler.js",
+                "scripts/content/ColorManager.js",
+                "scripts/content/ResponseHandler.js"
+            ],
+            "css": ["css/style.css"],
+            "run_at": "document_end"
+        }
+    ],
+    "background": {
+        "service_worker": "scripts/background/service_worker.js",
+        "type": "module"
+    },
+    "host_permissions": ["*://api.battlemetrics.com/*", "*://api.steampowered.com/*"],
+    "permissions": ["storage", "tabs", "scripting", "activeTab"],
+    "options_page": "settings/settings.html",
+    "icons": {
+        "16": "images/16.png",
+        "48": "images/48.png",
+        "128": "images/128.png"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["images/copy.svg"],
+            "matches": ["*://www.battlemetrics.com/*", "*://battlemetrics.com/*"]
+        }
+    ]
+}
