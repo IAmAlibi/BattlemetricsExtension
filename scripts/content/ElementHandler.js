@@ -122,6 +122,16 @@ async function createElements() {
     createElement("dt", "Teammates:", profileContainer);
     TEAM = createElement("dd", "Loading...", profileContainer);
 
+
+    // Historical Teammates Alibi Mod
+    createElement("dt", "Historical Teammates:", profileContainer);
+    HISTORICALTEAMMATES = createElement("dd", "", profileContainer);
+    const HISTORICALTEAMMATESBUTTON = createElement("a", "Click to check", HISTORICALTEAMMATES);
+    HISTORICALTEAMMATESBUTTON.onclick = () => {
+        chrome.runtime.sendMessage({ type: "GetHistoricalTeammates", SteamID: steamID });
+        HISTORICALTEAMMATES.innerText = "Loading...";
+    };
+
     // kills, deaths, kd
     createElement("br", "", profileContainer);
     createElement("dt", "Kills:", profileContainer);
@@ -191,8 +201,10 @@ async function createElements() {
     EACBANNEDIPSINFO = createElement("div", "", collapse);
     BMBANNEDIPSINFO = createElement("div", "", collapse);
     ONLINEFRIENDSINFO = createElement("div", "", collapse);
+    
     // Alibi Mod
     TEAMINFO = createElement("div", "", collapse);
+    HISTORICALTEAMMATESINFO = createElement("div", "", collapse);
     chrome.runtime.sendMessage({ type: "GetTeamLinks", SteamID: steamID });
 
     chrome.runtime.sendMessage({ type: "GetPlayerInfo", BMID: BMID, SteamID: steamID });

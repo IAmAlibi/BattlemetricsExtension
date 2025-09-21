@@ -1,8 +1,8 @@
 {
     "name": "Advanced BM RCON 2.0",
     "description": "Displays useful information about players on battlemetrics, making the life of admins a bit easier.",
-    "author": "Farkas",
-    "version": "2.0.0",
+    "author": "Alibi",
+    "version": "1.2.0",
     "manifest_version": 3,
     "content_scripts": [
         {

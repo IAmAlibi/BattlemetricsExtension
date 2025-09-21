@@ -16,9 +16,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         case "GetTeamLinks":
             handleTeamLinks(request.response);
             break;
+
+        case "GetHistoricalTeammates":
+            handleHistoricalTeammates(request.response);
+            break;
         
         case "GetOnlineFriends":
-
             handleOnlineFriends(request.response);
             break;
 
@@ -161,6 +164,58 @@ function handleTeamLinks(response) {
             const li = createElement("li", "", div);
             const a = createElement("a", teammate.name, li);
             a.href = `https://www.battlemetrics.com/rcon/players/${teammate.id}`;
+        }
+    }
+}
+
+// Alibi Mod
+function handleHistoricalTeammates(response) {
+    HISTORICALTEAMMATES.innerHTML = response.length;
+
+    if (response.length > 0) {
+        createElement("h4", `Historical Teammates (${response.length}):`, HISTORICALTEAMMATESINFO);
+        const div = createElement("ul", "", HISTORICALTEAMMATESINFO);
+
+        for (const teammate of response) {
+            const li = createElement("li", "", div);
+
+            // Name element, red if currently banned
+            const nameEl = createElement("span", teammate.name, li);
+            if (teammate.currentlyBanned) {
+                setStaticColor(nameEl, "Red");
+            }
+
+            // Prefix: PERM or days left
+            let prefixText = "";
+            if (teammate.currentlyBanned) {
+                prefixText = teammate.isPermanent ? "PERM" : teammate.daysLeft || "";
+            }
+
+            // Dash separator (plain text)
+            if (prefixText) {
+                createElement("span", ` - `, li);
+            }
+
+            // Hyperlink for the ban info (reason)
+            let reasonText = teammate.banReason || "";
+            // Remove leading dash if reasonText starts with "-"
+            reasonText = reasonText.replace(/^-\s*/, "");
+
+            if (reasonText) {
+                const reasonEl = createElement("a", reasonText, li);
+                if (teammate.banLink) reasonEl.href = teammate.banLink;
+                reasonEl.target = "_blank";
+                reasonEl.rel = "noopener noreferrer";
+            }
+
+            // Time ago + timestamp (standard color)
+            if (teammate.banTimeAgo && teammate.banTimestamp) {
+                createElement(
+                    "span",
+                    ` : ${teammate.banTimeAgo} (${new Date(teammate.banTimestamp).toLocaleString("en-US", { timeZone: "UTC", hour12: true })} UTC)`,
+                    li
+                );
+            }
         }
     }
 }
