@@ -180,10 +180,11 @@ function handleHistoricalTeammates(response) {
             const li = createElement("li", "", div);
 
             // Name element, red if currently banned
-            const nameEl = createElement("span", teammate.name, li);
+            const nameEl = createElement("a", teammate.name, li);
             if (teammate.currentlyBanned) {
                 setStaticColor(nameEl, "Red");
             }
+            nameEl.href = `https://www.battlemetrics.com/rcon/players/${teammate.id}`;
 
             // Prefix: PERM or days left
             let prefixText = "";
