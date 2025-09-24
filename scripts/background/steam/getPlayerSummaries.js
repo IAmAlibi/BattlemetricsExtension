@@ -28,5 +28,6 @@ export async function getPlayerSummaries(SteamToken, SteamID) {
         visibility: visibility,
         profileCreated: profileCreated,
         avatar: player.avatarmedium,
+        name: player.personaname,
     };
 }

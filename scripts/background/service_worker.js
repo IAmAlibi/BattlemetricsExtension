@@ -11,6 +11,7 @@ import { getPlaytime } from "./steam/getPlayTime.js";
 // Alibi Mod
 import { getTeamLinks } from "./battlemetrics/getTeamLinks.js";
 import { getHistoricalTeammates } from "./other/getHistoricalTeammates.js";
+import { getSteamBans } from "./steam/getSteamBans.js";
 
 
 let settings;
@@ -83,6 +84,12 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
             break;
         }
+
+        case "GetSteamBans": {
+            chrome.tabs.sendMessage(sender.tab.id, { type: "GetSteamBans", response: await getSteamBans(settings.SteamToken, request.SteamID) });
+            break;
+        }
+
 
         case "GetPlayerSummaries": {
             chrome.tabs.sendMessage(sender.tab.id, { type: "GetPlayerSummaries", response: await getPlayerSummaries(settings.SteamToken, request.SteamID) });

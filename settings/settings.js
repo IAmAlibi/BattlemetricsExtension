@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("RustAdmin").checked = settings.RustAdmin;
             document.getElementById("ServerArmour").checked = settings.ServerArmour;
             document.getElementById("RustStats").checked = settings.RustStats;
+            document.getElementById("Legacy").checked = settings.Legacy;
 
             if (settings.Servers !== undefined) {
                 for (const server of settings.Servers) {
@@ -56,6 +57,7 @@ function save() {
             RustAdmin: document.getElementById("RustAdmin").checked,
             ServerArmour: document.getElementById("ServerArmour").checked,
             RustStats: document.getElementById("RustStats").checked,
+            Legacy: document.getElementById("Legacy").checked,
         },
         () => {
             alert("Settings saved successfully.");

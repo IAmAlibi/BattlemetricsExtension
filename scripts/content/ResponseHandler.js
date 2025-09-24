@@ -21,6 +21,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             handleHistoricalTeammates(request.response);
             break;
         
+        case "GetSteamBans":
+            handleSteamBans(request.response);
+            break;
+        
         case "GetOnlineFriends":
             handleOnlineFriends(request.response);
             break;
@@ -100,6 +104,63 @@ function handlePlayerSummaries(response) {
     }
     STEAMPROFILECREATED.innerHTML = response.profileCreated;
     PROFILEPICTURE.src = response.avatar;
+    if (typeof PERSONA !== "undefined") {
+        PERSONA.innerHTML = response.name;
+    }
+}
+
+// Legacy
+function handleSteamBans(response) {
+    NUMBEROFVACBANS.innerHTML = response.NumberOfVACBans;
+    if (response.NumberOfVACBans > 0) {
+        setStaticColor(NUMBEROFVACBANS, "Red");
+    } else {
+        setStaticColor(NUMBEROFVACBANS, "LimeGreen");
+    }
+
+    NUMBEROFGAMEBANS.innerHTML = response.NumberOfGameBans;
+    if (response.NumberOfGameBans > 0) {
+        setStaticColor(NUMBEROFGAMEBANS, "Red");
+    } else {
+        setStaticColor(NUMBEROFGAMEBANS, "LimeGreen");
+    }
+
+    
+    if (response.NumberOfVACBans > 0 || response.NumberOfGameBans > 0) {
+        if (response.DaysSinceLastBan < 60) {
+            setStaticColor(LASTSTEAMBAN, "Red");
+        }
+        LASTSTEAMBAN.innerHTML = `${response.DaysSinceLastBan} days ago` ;
+    } else {
+        LASTSTEAMBAN.innerHTML = "Never";
+        setStaticColor(LASTSTEAMBAN, "LimeGreen");
+    }
+
+
+    if (response.CommunityBanned === true) {
+        COMMUNITYBANNED.innerHTML = "Yes";
+        setStaticColor(COMMUNITYBANNED, "Red");
+    } else {
+        COMMUNITYBANNED.innerHTML = "No";
+        setStaticColor(COMMUNITYBANNED, "LimeGreen");
+    }
+    
+    if (response.EconomyBan === undefined) {
+        ECONOMYBANNED.innerHTML = "No";
+    } else {
+        ECONOMYBANNED.innerHTML = response.EconomyBan;
+    }
+
+    function showVacStatus(hasVacBan, vacIcon) {
+        vacIcon.style.display = hasVacBan ? "inline" : "none";
+    }
+
+    function showGBStatus(hasGameBan, gbIcon) {
+        gbIcon.style.display = hasGameBan ? "inline" : "none";
+    }
+
+    showVacStatus(response.NumberOfVACBans > 0, vacIcon);
+    showGBStatus(response.NumberOfGameBans > 0, gbIcon);
 }
 
 function handleActivity(response) {

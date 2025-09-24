@@ -1,4 +1,6 @@
 let settings;
+let vacIcon;
+let gbIcon;
 async function createElements() {
     if (settings == undefined) await loadSettings();
     if (settings.BMToken === undefined || settings.BMToken === "" || settings.SteamToken === undefined || settings.SteamToken === "") return;
@@ -62,8 +64,86 @@ async function createElements() {
     SERVERIP = createElement("h4", "IP: Loading...", headContainer);
     JOINED = createElement("h4", "Joined:", headContainer);
 
+
     // steam profile visibility, limited, account created (steam + bm)
     const profileContainer = createElement("div", "", playerData);
+
+    // Legacy Mod
+
+    if (settings.Legacy === true) {
+
+        // remove new stuff
+        removeProfileBlocks();
+
+        new MutationObserver(() => removeProfileBlocks())
+            .observe(document, { childList: true, subtree: true });
+
+        
+        // recreate old format
+        createElement("br", "", profileContainer);
+
+        createElement("dt", "Steam Profile:", profileContainer);
+        const steamProfile = createElement("dd", "", profileContainer);
+        const steamProfileLink = createElement("a", "View Profile on Steam Community", steamProfile);
+        steamProfileLink.href = `https://steamcommunity.com/profiles/${steamID}`;
+        steamProfileLink.setAttribute("target", "_blank");
+
+
+        createElement("dt", "Profile Name:", profileContainer);
+        PERSONA = createElement("dd", "Loading...", profileContainer);
+
+
+
+        const dtvac = createElement("dt", "", profileContainer);
+
+        vacIcon = document.createElement("img");
+        vacIcon.src = "https://cdn.battlemetrics.com/app/assets/vac.c29df.svg";
+        vacIcon.width = 20;
+        vacIcon.height = 20;
+        vacIcon.setAttribute("role", "presentation");
+        vacIcon.style.verticalAlign = "text-top";
+        vacIcon.style.display = "none"; // hide initially
+        vacIcon.style.position = "relative";
+        vacIcon.style.top = "-4px"; 
+        dtvac.appendChild(vacIcon);
+
+        dtvac.appendChild(document.createTextNode(" VAC Bans:"));
+
+        NUMBEROFVACBANS = createElement("dd", "Loading...", profileContainer);
+
+
+        const dtgame = createElement("dt", "", profileContainer);
+
+        gbIcon = document.createElement("img");
+        gbIcon.src = "https://cdn.battlemetrics.com/app/assets/hammer.ff7ec.svg";
+        gbIcon.width = 20;
+        gbIcon.height = 20;
+        gbIcon.setAttribute("role", "presentation");
+        gbIcon.style.verticalAlign = "text-top";
+        gbIcon.style.display = "none"; // hide initially
+        gbIcon.style.position = "relative";
+        gbIcon.style.top = "-4px"; 
+        dtgame.appendChild(gbIcon);
+
+        dtgame.appendChild(document.createTextNode(" Game Bans:"));
+
+        NUMBEROFGAMEBANS = createElement("dd", "Loading...", profileContainer);
+
+
+        createElement("dt", "Last Steam Ban:", profileContainer);
+        LASTSTEAMBAN = createElement("dd", "Loading...", profileContainer);
+
+        createElement("dt", "Community Banned:", profileContainer);
+        COMMUNITYBANNED = createElement("dd", "Loading...", profileContainer);
+
+        createElement("dt", "Economy Ban:", profileContainer);
+        ECONOMYBANNED = createElement("dd", "Loading...", profileContainer);
+        
+    }
+
+
+
+
     createElement("br", "", profileContainer);
     createElement("dt", "Steam Profile Visibility:", profileContainer);
     STEAMPROFILEVISIBILITY = createElement("dd", "Loading...", profileContainer);
@@ -211,7 +291,23 @@ async function createElements() {
     chrome.runtime.sendMessage({ type: "GetPlayerSummaries", SteamID: steamID });
     chrome.runtime.sendMessage({ type: "GetSteamPlaytime", SteamID: steamID });
     chrome.runtime.sendMessage({ type: "GetActivity", BMID: BMID });
+    if (settings.Legacy === true) {
+        chrome.runtime.sendMessage({ type: "GetSteamBans", SteamID: steamID });
+    }
 }
+
+
+
+
+function removeProfileBlocks(root = document) {
+  document.querySelectorAll('.steam-profile').forEach(profile => {
+    const container = profile.parentElement; 
+    if (container) {
+      container.remove();
+    }
+  });
+}
+
 
 function createElement(tag, content, parent, id) {
     let newElement = document.createElement(tag);
@@ -228,7 +324,7 @@ function getCurrentBMUserID() {
 }
 
 async function loadSettings() {
-    settings = await chrome.storage.local.get(["BMToken", "SteamToken", "Arkan", "Guardian", "RustAdmin", "ServerArmour", "RustStats", "Servers"]);
+    settings = await chrome.storage.local.get(["BMToken", "SteamToken", "Arkan", "Guardian", "RustAdmin", "ServerArmour", "RustStats", "Servers", "Legacy"]);
 }
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
