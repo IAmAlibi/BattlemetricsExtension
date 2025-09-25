@@ -5,9 +5,16 @@ export async function getTeamLinks(BMToken, SteamID, YourServers) {
             `https://api.battlemetrics.com/players?filter[search]=${SteamID}`,
             { headers: { Authorization: `Bearer ${BMToken}` } }
         );
+
         if (!res.ok) throw new Error(`Failed to resolve SteamID ${SteamID}: ${res.status}`);
         const data = await res.json();
-        bmPlayerId = data?.data?.[0]?.id;
+
+        // Look for a positiveMatch first
+        const match = data?.data?.find(p => p.attributes?.positiveMatch === true);
+
+        // If none, fallback to the first result
+        bmPlayerId = match?.id ?? data?.data?.[0]?.id;
+
         if (!bmPlayerId) return [];
     } catch (err) {
         console.error("Error resolving BM player ID:", err);
@@ -18,11 +25,13 @@ export async function getTeamLinks(BMToken, SteamID, YourServers) {
     let recentServerId = null;
     try {
         const serverIds = YourServers.filter(x => x.enabled).map(x => x.id);
+
         const url = `https://api.battlemetrics.com/players/${bmPlayerId}/relationships/sessions?include=server&fields[session]=start,stop&fields[server]=name&page[size]=20`;
         const res = await fetch(url, { headers: { Authorization: `Bearer ${BMToken}` } });
         if (!res.ok) throw new Error(`Failed to fetch sessions: ${res.status}`);
         const json = await res.json();
         const sessions = (json?.data || []).slice(0, 20);
+
 
         for (const session of sessions) {
             const serverId = session.relationships?.server?.data?.id;
@@ -37,6 +46,7 @@ export async function getTeamLinks(BMToken, SteamID, YourServers) {
     }
 
     if (!recentServerId) return [];
+
 
     // Fetch teammates from RCON
     let uniqueIDs = new Set();
@@ -63,6 +73,7 @@ export async function getTeamLinks(BMToken, SteamID, YourServers) {
 
         const resultNode = json?.data?.attributes?.result?.[0]?.children?.[1]?.children?.[0]?.children?.[0];
         const resultText = resultNode?.reference?.result || "";
+
 
         if (resultText && !resultText.includes("Player not found")) {
             const matches = resultText.match(/7656119\d{10}/g) || [];

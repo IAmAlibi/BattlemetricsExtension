@@ -15,16 +15,27 @@ async function createElements() {
     let steamID;
 
 
-    function findSteamID() {
-        const pageText = document.body.innerHTML; 
-        const regex = /7656119\d{10}/;  // 7656119 + 10 more digits = 17 total
-        const match = pageText.match(regex);
+   function findSteamID() {
+        // Find the element that actually says "Steam ID"
+        const steamIdLabel = [...document.querySelectorAll("div")]
+            .find(el => el.textContent.trim() === "Steam ID");
 
-        if (match) {
-            console.log("Found SteamID:", match[0]);
-            return match[0];
+        if (!steamIdLabel) {
+            console.log("No SteamID label found.");
+            return null;
+        }
+
+        // The actual SteamID is in a sibling <div title="7656119...">
+        const steamIdDiv = steamIdLabel.parentElement
+            ?.previousElementSibling?.querySelector("div[title^='7656119']");
+
+        const steamId = steamIdDiv?.getAttribute("title");
+
+        if (steamId) {
+            console.log("Found SteamID:", steamId);
+            return steamId;
         } else {
-            console.log("No SteamID found.");
+            console.log("SteamID label found, but no value extracted.");
             return null;
         }
     }
