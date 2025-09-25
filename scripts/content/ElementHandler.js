@@ -14,43 +14,41 @@ async function createElements() {
     let playerData;
     let steamID;
 
-    let steamInformationTabExists = false;
-    for (const childNode of col.childNodes) {
-        if (childNode.childNodes[0].childNodes[0]?.innerText.includes("Steam Information")) {
-            steamInformationTabExists = true;
+
+    function findSteamID() {
+        const pageText = document.body.innerHTML; 
+        const regex = /7656119\d{10}/;  // 7656119 + 10 more digits = 17 total
+        const match = pageText.match(regex);
+
+        if (match) {
+            console.log("Found SteamID:", match[0]);
+            return match[0];
+        } else {
+            console.log("No SteamID found.");
+            return null;
         }
     }
 
-    if (steamInformationTabExists) {
-        playerData = col.childNodes[1].childNodes[1].childNodes[0];
-        steamID = playerData.children[1].children[0].getAttribute("href").match("[0-9]+$")[0];
-    } else {
-        // fix for bm not querying steam details (Steam Information tab missing)
-        for (const x of col.childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[1].childNodes) {
-            if (x.childNodes[1].childNodes[0].innerText === "Steam ID") {
-                steamID = x.childNodes[0].childNodes[0].childNodes[0].innerText;
-            }
-        }
 
-        const div = createElement("div", "", col);
-        const h2 = createElement("h2", "", div);
-        h2.classList.add("css-1xs030v");
-        const s = createElement("span", "", h2);
-        const i = createElement("i", "", s);
-        i.classList.add("glyphicon");
-        i.classList.add("glyphicon-chevron-right");
-        i.classList.add("css-a52oks");
-        s.innerHTML += "Steam Information";
-        const collapse = createElement("div", "", div);
-        collapse.classList.add("collapse");
-        collapse.classList.add("in");
-        playerData = createElement("dl", "", collapse);
-        playerData.classList.add("dl-horizontal");
+    const div1 = createElement("div", "", col);
+    const h21 = createElement("h2", "", div1);
+    h21.classList.add("css-1xs030v");
+    const s1 = createElement("span", "", h21);
+    const i1 = createElement("i", "", s1);
+    i1.classList.add("glyphicon");
+    i1.classList.add("glyphicon-chevron-right");
+    i1.classList.add("css-a52oks");
+    s1.innerHTML += "Steam Information";
+    const collapse1 = createElement("div", "", div1);
+    collapse1.classList.add("collapse");
+    collapse1.classList.add("in");
+    playerData = createElement("dl", "", collapse1);
+    playerData.classList.add("dl-horizontal");
 
-        row.childNodes[0].childNodes[0].after(div);
-    }
+    row.childNodes[0].childNodes[0].after(div1);
 
-    if (steamID === undefined) return;
+
+    steamID = findSteamID();
 
     // head
     const headContainer = createElement("div", "", playerPage);
